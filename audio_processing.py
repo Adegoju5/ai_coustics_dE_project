@@ -26,7 +26,7 @@ def find_audio_links(url):
     else:
         print(f"Error: Unable to fetch content from {url}. Status code: {response.status_code}")
         return []
-def upload_to_gcp_storage(key_file_path, bucket_name, local_file_path, remote_file_name):
+def upload_to_gcp_storage(key_file_path, bucket_name, local_file_path, file_name):
     """
     Uploads a file to a GCP Storage bucket.
 
@@ -34,7 +34,7 @@ def upload_to_gcp_storage(key_file_path, bucket_name, local_file_path, remote_fi
         key_file_path : key path to google cloud connection
         bucket_name (str): The name of the GCP Storage bucket.
         local_file_path (str): The local path to the file to upload.
-        remote_file_name (str): The name to give the file in the bucket.
+        file_name (str): The name to give the file in the bucket.
 
     Returns:
         str: The public URL of the uploaded file.
@@ -43,7 +43,7 @@ def upload_to_gcp_storage(key_file_path, bucket_name, local_file_path, remote_fi
 
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(remote_file_name)
+    blob = bucket.blob(file_name)
     blob.upload_from_filename(local_file_path)
     return blob.public_url
 
@@ -149,7 +149,7 @@ def insert_into_bigquery(key_file_path, table_id,gcp_url, file_name, duration_ms
     job_config = bigquery.QueryJobConfig(query_parameters=query_params)
     query_job = client.query(query, job_config=job_config)
 
-    return f"Data inserted/updated in BigQuery. gcp_url: {gcp_url}, Classification: {classification}"
+    return print(f"Successfully inserted data into BigQuery.")
 
 
 # Example usage:
@@ -179,7 +179,7 @@ for each_link in audio_links:
         file.write(audio_response.content)
 
     # Upload the file to GCP Storage
-    gcp_url = upload_to_gcp_storage(bucket_name, local_file_path, file_name)
+    gcp_url = upload_to_gcp_storage(key_file_path, bucket_name, local_file_path, file_name)
 
     # Get audio metadata
     duration_ms, loudness = get_audio_metadata(local_file_path)
@@ -188,7 +188,7 @@ for each_link in audio_links:
     classification = classify_audio(duration_ms, loudness)
 
     # Insert data into BigQuery
-    result = insert_into_bigquery(gcp_url, file_name, duration_ms, loudness, classification)
+    result = insert_into_bigquery(key_file_path, table_id,gcp_url, file_name, duration_ms, loudness, classification)
 
 
     # Clean up: Remove the temporary local file

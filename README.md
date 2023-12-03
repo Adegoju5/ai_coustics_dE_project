@@ -21,7 +21,7 @@ Before running the script, make sure you have the following:
 ### Python Dependencies:
 Install the required Python libraries using the following command:
 ```bash
-pip install google-cloud-storage google-cloud-bigquery pydub beautifulsoup4 
+pip install google-cloud-storage google-cloud-bigquery google-cloud-core pydub beautifulsoup4 requests os
 ```
 # Script Configuration
 
